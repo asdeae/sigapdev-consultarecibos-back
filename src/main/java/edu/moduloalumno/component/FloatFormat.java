@@ -61,20 +61,103 @@ public class FloatFormat {
 	        
 	        Reader reader = new StringReader(lineafinal.trim());
 	        p = mapper.readValue(reader, PruebaTCambio.class);
-			
+
+
 			logger.info("> objeto "+p);
+			//Cuando no existe variaciones en el tipo de cambio en la fecha
 			if(p.getCompra() == 0.0 ) {
-				logger.info("> string "+ dateString);
-				p=dolares_a_soles(dateString);
+					//logger.info("> string "+ fecha);
+
+
+					String fechas[] = fecha.split("-",3); //Se realiza un split por regex "-" para separar días,meses y años gaaaa
+
+					//Capturando los días, meses y años
+					Integer dia = Integer.valueOf(fechas[2]);
+					Integer mes  = Integer.valueOf(fechas[1]);
+					Integer anio  = Integer.valueOf(fechas[0]);
+
+
+					//Reduciendo días para encontrar el último valor del tipo de cambio
+
+
+					//Verificando los días
+					if(dia==1)
+					{
+						switch (mes)
+						{
+							case 1: anio--;
+									dia=31;
+									mes=12;
+									break;
+							case 2: dia=31;
+									mes=1;
+									break;
+							case 3: if(isLeap(anio))
+										dia=29;
+									else
+										dia=28;
+									mes=2;
+									break;
+							case 4:	dia=31;
+									mes=3;
+									break;
+							case 5:	dia=30;
+									mes=4;
+									break;
+							case 6: dia=31;
+									mes=5;
+									break;
+							case 7: dia=30;
+									mes=6;
+									break;
+							case 8: dia=31;
+									mes=7;
+									break;
+							case 9: dia=31;
+									mes=8;
+									break;
+							case 10: dia=30;
+									 mes=9;
+									 break;
+							case 11: dia=31;
+									 mes=10;
+									 break;
+							case 12: dia=30;
+							         mes=11;
+									break;
+							default: break;
+						}
+					}
+					else
+						dia--;
+
+					//Se construye un formato para la fecha con StringBuilder
+					StringBuilder fecha_anterior = new StringBuilder();
+					fecha_anterior.append(Integer.valueOf(anio)+"-"+"0"+mes+"-"+dia);
+
+					//Se aplica el método recursivo
+					p=dolares_a_soles(fecha_anterior.toString());
 			}
 			logger.info("> objeto "+p);
+
+			System.out.println(dateString);
 			in.close();
 		
 		} catch (IOException e){
 			System.out.println("ERROR! USUARIOS NO GUARDADOS : " + e.getMessage());
 		}
-	
+
 		return p; 
   	}
+
+
+  	//Confirms if the current year is leap
+  	public boolean isLeap(Integer year)
+	{
+		if (((year % 4 == 0) && (year % 100!= 0)) || (year%400 == 0))
+				return true;
+			else
+				return false;
+	}
 	
 }
